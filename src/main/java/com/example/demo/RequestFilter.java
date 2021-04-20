@@ -24,7 +24,7 @@ public class RequestFilter extends OncePerRequestFilter {
         final String requestToken = httpServletRequest.getHeader("Authorization");
         UserAuthentication authentication = new UserAuthentication();
 
-        if (!requestToken.isEmpty()) {
+        if (requestToken != null) {
             try {
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(requestToken);
                 String uid = decodedToken.getUid();

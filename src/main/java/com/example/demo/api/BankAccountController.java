@@ -19,5 +19,4 @@ public class BankAccountController {
         Authentication authentication = securityContext.getAuthentication();
         return authentication.getName();
     }
-
 }
