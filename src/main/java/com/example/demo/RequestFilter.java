@@ -32,7 +32,7 @@ public class RequestFilter extends OncePerRequestFilter {
         final String requestToken = request.getHeader("Authorization");
 
         if (requestToken == null) {
-            response.sendError(401, "Authorization header is missing");
+            response.sendError(403, "Authorization header is missing");
             return;
         }
         // Public paths
@@ -41,21 +41,25 @@ public class RequestFilter extends OncePerRequestFilter {
             UserAuthentication authentication = new UserAuthentication();
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(requestToken);
             String uid = decodedToken.getUid();
-
             authentication.setName(uid);
-            boolean isAuthenticated = decodedToken.isEmailVerified() && customerRepository.findByUid(uid) != null;
 
-            if (!publicPaths.contains(request.getRequestURI()) && !isAuthenticated) {
-                response.sendError(401, "Please complete your signup");
-                return;
-            }
             CustomerEntity customerEntity = customerRepository.findByUid(uid);
             authentication.setPrincipal(customerEntity);
-            authentication.setAuthenticated(isAuthenticated);
+            authentication.setCredential(decodedToken);
+            if (publicPaths.contains(request.getRequestURI())) {
+                authentication.setAuthenticated(true);
+            } else {
+                boolean isAuthenticated = decodedToken.isEmailVerified() && customerRepository.findByUid(uid) != null;
+                authentication.setAuthenticated(isAuthenticated);
+                if (!isAuthenticated) {
+                    response.sendError(403, "Not authorized");
+                    return;
+                }
+            }
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (FirebaseAuthException e) {
-            response.sendError(401, "Authorization token is invalid");
+            response.sendError(403, "Authorization token is invalid/expired");
             return;
         }
 

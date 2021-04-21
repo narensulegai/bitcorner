@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.model.CustomerEntity;
+import com.google.firebase.auth.FirebaseToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +12,7 @@ public class UserAuthentication implements Authentication {
     String name = null;
     boolean isAuthenticated = false;
     CustomerEntity customerEntity = null;
+    FirebaseToken firebaseToken = null;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -23,7 +25,7 @@ public class UserAuthentication implements Authentication {
 
     @Override
     public Object getCredentials() {
-        return null;
+        return firebaseToken;
     }
 
     @Override
@@ -57,5 +59,9 @@ public class UserAuthentication implements Authentication {
 
     public void setPrincipal(CustomerEntity customerEntity) {
         this.customerEntity = customerEntity;
+    }
+
+    public void setCredential(FirebaseToken firebaseToken) {
+        this.firebaseToken = firebaseToken;
     }
 }
