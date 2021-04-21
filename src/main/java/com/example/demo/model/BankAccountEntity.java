@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.example.demo.Currency;
+
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -9,23 +11,31 @@ import javax.validation.constraints.NotBlank;
 public class BankAccountEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    Long id;
     @NotBlank(message = "Bank name cannot be empty")
-    private String bankName;
+    String bankName;
     @NotBlank(message = "Country cannot be empty")
-    private String country;
+    String country;
     @NotBlank(message = "Account number cannot be empty")
-    private String accountNumber;
+    String accountNumber;
     @NotBlank(message = "Owner name cannot be empty")
-    private String ownerName;
+    String ownerName;
     @NotBlank(message = "Address cannot be empty")
-    private String address;
-    @NotBlank(message = "Currency cannot be empty")
-    private String currency;
+    String address;
+    @Enumerated(EnumType.STRING)
+    Currency currency = Currency.USD;
     @Min(0)
-    private int balance;
+    int balance = 0;
     @Min(0)
-    private int bitcoins;
+    int bitcoins = 0;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public int getBalance() {
         return balance;
@@ -79,13 +89,12 @@ public class BankAccountEntity {
         this.address = address;
     }
 
-    public String getCurrency() {
+    public Currency getCurrency() {
         return currency;
     }
 
-    public void setCurrency(String currency) {
+    public void setCurrency(Currency currency) {
         this.currency = currency;
     }
-
 
 }
