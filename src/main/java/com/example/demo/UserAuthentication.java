@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.model.CustomerEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,7 +10,7 @@ import java.util.*;
 public class UserAuthentication implements Authentication {
     String name = null;
     boolean isAuthenticated = false;
-
+    CustomerEntity customerEntity = null;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -32,7 +33,7 @@ public class UserAuthentication implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return null;
+        return customerEntity;
     }
 
     @Override
@@ -52,5 +53,9 @@ public class UserAuthentication implements Authentication {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setPrincipal(CustomerEntity customerEntity) {
+        this.customerEntity = customerEntity;
     }
 }
