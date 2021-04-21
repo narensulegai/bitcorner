@@ -46,16 +46,14 @@ public class RequestFilter extends OncePerRequestFilter {
             CustomerEntity customerEntity = customerRepository.findByUid(uid);
             authentication.setPrincipal(customerEntity);
             authentication.setCredential(decodedToken);
-            if (publicPaths.contains(request.getRequestURI())) {
-                authentication.setAuthenticated(true);
-            } else {
+            if (!publicPaths.contains(request.getRequestURI())) {
                 boolean isAuthenticated = decodedToken.isEmailVerified() && customerRepository.findByUid(uid) != null;
-                authentication.setAuthenticated(isAuthenticated);
                 if (!isAuthenticated) {
                     response.sendError(403, "Not authorized");
                     return;
                 }
             }
+            authentication.setAuthenticated(true);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (FirebaseAuthException e) {

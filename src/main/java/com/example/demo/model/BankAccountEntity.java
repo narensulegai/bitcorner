@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -19,8 +20,28 @@ public class BankAccountEntity {
     private String ownerName;
     @NotBlank(message = "Address cannot be empty")
     private String address;
-    @NotBlank(message = "Primary currency cannot be empty")
+    @NotBlank(message = "Currency cannot be empty")
     private String currency;
+    @Min(0)
+    private int balance;
+    @Min(0)
+    private int bitcoins;
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int balance) {
+        this.balance = balance;
+    }
+
+    public int getBitcoins() {
+        return bitcoins;
+    }
+
+    public void setBitcoins(int bitcoins) {
+        this.bitcoins = bitcoins;
+    }
 
     public String getOwnerName() {return ownerName;}
 
