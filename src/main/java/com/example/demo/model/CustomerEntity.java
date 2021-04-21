@@ -3,9 +3,8 @@ package com.example.demo.model;
 import com.sun.istack.Nullable;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
+//https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/collections.html#collections-ofvalues
 @Entity
 @Table(name = "customer")
 public class CustomerEntity {
