@@ -18,10 +18,22 @@ public class CustomerEntity {
     @Nullable
     String name;
 
+    @Column(unique = true)
+    @Nullable
+    String email;
+
     @Nullable
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "bank_account_id", referencedColumnName = "id")
     BankAccountEntity bankAccount;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getUid() {
         return uid;

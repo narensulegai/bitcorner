@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import com.example.demo.model.CustomerEntity;
 import com.example.demo.repository.CustomerRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -37,13 +36,6 @@ public class RequestFilter extends OncePerRequestFilter {
 
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(requestToken);
                 String uid = decodedToken.getUid();
-                System.out.println(uid);
-                if (customerRepository.findByUid(uid) == null) {
-                    CustomerEntity newCustomerEntity = new CustomerEntity();
-                    newCustomerEntity.setUid(uid);
-                    customerRepository.save(newCustomerEntity);
-                }
-
                 authentication.setName(uid);
                 authentication.setPrincipal(customerRepository.findByUid(uid));
                 authentication.setAuthenticated(decodedToken.isEmailVerified());
