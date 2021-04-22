@@ -5,4 +5,5 @@ public enum Currency {
     GBP,
     INR,
     RMB,
+    BITCOIN
 }
