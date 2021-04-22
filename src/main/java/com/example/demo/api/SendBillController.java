@@ -31,6 +31,16 @@ public class SendBillController {
 
     @ResponseBody
     @PostMapping
+    public SendBillEntity create(@RequestBody @Valid SendBillEntity sendBillEntity) {
+        CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        sendBillEntity.setCustomer(customerEntity);
+        return sendBillRepository.save(sendBillEntity);
+    }
+
+    @ResponseBody
+    @PutMapping
     public SendBillEntity update(@RequestBody @Valid SendBillEntity sendBillEntity) {
         CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
