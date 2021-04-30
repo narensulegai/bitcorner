@@ -1,7 +1,7 @@
 package com.example.demo.api;
 
-import com.example.demo.model.CustomerEntity;
 import com.example.demo.model.BillEntity;
+import com.example.demo.model.CustomerEntity;
 import com.example.demo.repository.BillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,8 +11,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/sendBill")
-public class SendBillController {
+@RequestMapping(path = "/payBill")
+public class PayBillController {
 
     @Autowired
     BillRepository billRepository;
@@ -23,26 +23,16 @@ public class SendBillController {
         CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        return billRepository.findByCustomerId(customerEntity.getId());
+        return billRepository.findByEmail(customerEntity.getEmail());
     }
 
     @ResponseBody
     @PostMapping
-    public BillEntity create(@RequestBody @Valid BillEntity billEntity) {
+    public BillEntity set(@RequestBody @Valid BillEntity billEntity) {
         CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        billEntity.setCustomer(customerEntity);
-        return billRepository.save(billEntity);
-    }
-
-    @ResponseBody
-    @PutMapping
-    public BillEntity update(@RequestBody @Valid BillEntity billEntity) {
-        CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-
-        billEntity.setCustomer(customerEntity);
+        billEntity.setEmail(customerEntity.getEmail());
         return billRepository.save(billEntity);
     }
 }

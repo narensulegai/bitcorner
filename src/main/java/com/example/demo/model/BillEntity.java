@@ -12,8 +12,8 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
-@Table(name = "send_bill")
-public class SendBillEntity {
+@Table(name = "bill")
+public class BillEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
