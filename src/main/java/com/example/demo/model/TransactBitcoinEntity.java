@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import com.example.demo.Currency;
+import com.example.demo.OrderStatus;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -21,9 +22,20 @@ public class TransactBitcoinEntity {
     @Enumerated(EnumType.STRING)
     Currency currency = Currency.USD;
 
+    @Enumerated(EnumType.STRING)
+    OrderStatus status = OrderStatus.OPEN;
+
     boolean isMarketOrder = true;
 
     boolean isBuy = true;
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
 
     public boolean isBuy() {
         return isBuy;
