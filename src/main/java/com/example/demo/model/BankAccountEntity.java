@@ -3,7 +3,6 @@ package com.example.demo.model;
 import com.example.demo.Currency;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -23,11 +22,7 @@ public class BankAccountEntity {
     @NotBlank(message = "Address cannot be empty")
     String address;
     @Enumerated(EnumType.STRING)
-    Currency currency = Currency.USD;
-    @Min(0)
-    int balance = 0;
-    @Min(0)
-    int bitcoins = 0;
+    Currency primaryCurrency = Currency.USD;
 
     public Long getId() {
         return id;
@@ -37,25 +32,13 @@ public class BankAccountEntity {
         this.id = id;
     }
 
-    public int getBalance() {
-        return balance;
+    public String getOwnerName() {
+        return ownerName;
     }
 
-    public void setBalance(int balance) {
-        this.balance = balance;
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
-
-    public int getBitcoins() {
-        return bitcoins;
-    }
-
-    public void setBitcoins(int bitcoins) {
-        this.bitcoins = bitcoins;
-    }
-
-    public String getOwnerName() {return ownerName;}
-
-    public void setOwnerName(String ownerName) {this.ownerName = ownerName;}
 
     public String getBankName() {
         return bankName;
@@ -89,12 +72,12 @@ public class BankAccountEntity {
         this.address = address;
     }
 
-    public Currency getCurrency() {
-        return currency;
+    public Currency getPrimaryCurrency() {
+        return primaryCurrency;
     }
 
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
+    public void setPrimaryCurrency(Currency primaryCurrency) {
+        this.primaryCurrency = primaryCurrency;
     }
 
 }
