@@ -6,8 +6,8 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 
 @Entity
-@Table(name = "buy_bitcoin")
-public class BuyBitcoinEntity {
+@Table(name = "transact_bitcoin")
+public class TransactBitcoinEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
@@ -22,6 +22,16 @@ public class BuyBitcoinEntity {
     Currency currency = Currency.USD;
 
     boolean isMarketOrder = true;
+
+    boolean isBuy = true;
+
+    public boolean isBuy() {
+        return isBuy;
+    }
+
+    public void setBuy(boolean isBuy) {
+        this.isBuy = isBuy;
+    }
 
     Integer minPrice = null;
 
