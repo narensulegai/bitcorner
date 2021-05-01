@@ -19,11 +19,22 @@ public class TransactBitcoinEntity {
     @Min(0)
     int amount = 0;
 
+    @Min(0)
+    int bitcoins = 0;
+
     @Enumerated(EnumType.STRING)
     Currency currency = Currency.USD;
 
     @Enumerated(EnumType.STRING)
     OrderStatus status = OrderStatus.OPEN;
+
+    public int getBitcoins() {
+        return bitcoins;
+    }
+
+    public void setBitcoins(int bitcoins) {
+        this.bitcoins = bitcoins;
+    }
 
     boolean isMarketOrder = true;
 

@@ -1,10 +1,8 @@
 package com.example.demo.api;
 
 import com.example.demo.model.CustomerEntity;
-import com.example.demo.model.SellBitcoinEntity;
 import com.example.demo.model.TransactBitcoinEntity;
 import com.example.demo.repository.CustomerRepository;
-import com.example.demo.repository.SellBitcoinRepository;
 import com.example.demo.repository.TransactBitcoinRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
