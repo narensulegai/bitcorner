@@ -2,11 +2,7 @@ package com.example.demo.model;
 
 import com.sun.istack.Nullable;
 
-import java.math.BigDecimal;
-
 import javax.persistence.*;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Min;
 
 //https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/collections.html#collections-ofvalues
 @Entity
