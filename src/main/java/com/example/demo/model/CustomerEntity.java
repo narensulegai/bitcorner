@@ -30,12 +30,6 @@ public class CustomerEntity {
     @Nullable
     @OneToOne(cascade = {CascadeType.ALL})
     BankAccountEntity bankAccount;
-    
-
-    @Min(0)
-    @Digits(integer=9, fraction=8)
-    BigDecimal bitcoinBalance = BigDecimal.valueOf(0);
-    
 
 	public Long getId() {
         return id;
@@ -73,18 +67,8 @@ public class CustomerEntity {
         return bankAccount;
     }
     
-
     public BankAccountEntity setBankAccount(BankAccountEntity bankAccount) {
         return this.bankAccount = bankAccount;
     }
-    
-
-    public BigDecimal getBitcoinBalance() {
-		return bitcoinBalance;
-	}
-
-	public void setBitcoinBalance(BigDecimal bitcoinBalance) {
-		this.bitcoinBalance = bitcoinBalance;
-	}
 
 }
