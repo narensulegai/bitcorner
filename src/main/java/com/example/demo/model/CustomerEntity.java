@@ -34,7 +34,7 @@ public class CustomerEntity {
 
     @Min(0)
     @Digits(integer=9, fraction=8)
-    BigDecimal balance = BigDecimal.valueOf(0);
+    BigDecimal bitcoinBalance = BigDecimal.valueOf(0);
     
 
 	public Long getId() {
@@ -79,12 +79,12 @@ public class CustomerEntity {
     }
     
 
-    public BigDecimal getBalance() {
-		return balance;
+    public BigDecimal getBitcoinBalance() {
+		return bitcoinBalance;
 	}
 
-	public void setBalance(BigDecimal balance) {
-		this.balance = balance;
+	public void setBitcoinBalance(BigDecimal bitcoinBalance) {
+		this.bitcoinBalance = bitcoinBalance;
 	}
 
 }
