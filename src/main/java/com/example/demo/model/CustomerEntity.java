@@ -2,7 +2,11 @@ package com.example.demo.model;
 
 import com.sun.istack.Nullable;
 
+import java.math.BigDecimal;
+
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
 
 //https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/collections.html#collections-ofvalues
 @Entity
@@ -26,8 +30,14 @@ public class CustomerEntity {
     @Nullable
     @OneToOne(cascade = {CascadeType.ALL})
     BankAccountEntity bankAccount;
+    
 
-    public Long getId() {
+    @Min(0)
+    @Digits(integer=9, fraction=8)
+    BigDecimal balance = BigDecimal.valueOf(0);
+    
+
+	public Long getId() {
         return id;
     }
 
@@ -62,8 +72,19 @@ public class CustomerEntity {
     public BankAccountEntity getBankAccount() {
         return bankAccount;
     }
+    
 
     public BankAccountEntity setBankAccount(BankAccountEntity bankAccount) {
         return this.bankAccount = bankAccount;
     }
+    
+
+    public BigDecimal getBalance() {
+		return balance;
+	}
+
+	public void setBalance(BigDecimal balance) {
+		this.balance = balance;
+	}
+
 }
