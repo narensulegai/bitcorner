@@ -3,8 +3,6 @@ package com.example.demo.model;
 import com.example.demo.Currency;
 import com.example.demo.OrderStatus;
 
-import java.math.BigDecimal;
-
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 
