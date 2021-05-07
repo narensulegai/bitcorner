@@ -27,7 +27,7 @@ public class CustomerEntity {
     @OneToOne(cascade = {CascadeType.ALL})
     BankAccountEntity bankAccount;
 
-    public Long getId() {
+	public Long getId() {
         return id;
     }
 
@@ -62,8 +62,9 @@ public class CustomerEntity {
     public BankAccountEntity getBankAccount() {
         return bankAccount;
     }
-
+    
     public BankAccountEntity setBankAccount(BankAccountEntity bankAccount) {
         return this.bankAccount = bankAccount;
     }
+
 }
