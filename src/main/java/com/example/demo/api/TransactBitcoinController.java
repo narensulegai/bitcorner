@@ -44,6 +44,10 @@ public class TransactBitcoinController {
 
 	private boolean helper(List<TransactBitcoinEntity> buyOrders, List<TransactBitcoinEntity> list, int target, int currentIndex) {
 
+		
+		if(target == 0)
+			return true;
+		
 		if(currentIndex == buyOrders.size()) {
 			if(target == 0)
 				return true;
@@ -65,7 +69,9 @@ public class TransactBitcoinController {
 	private void tryToSettle(List<TransactBitcoinEntity> buyOrders, TransactBitcoinEntity sellOrders) {
 
 		List<TransactBitcoinEntity> list = new ArrayList<TransactBitcoinEntity>();
+		//the list which will store the required combination
 
+		//the function which checks for the required combination, result basically tells us whether we have got required combination or not
 		boolean result = helper(buyOrders, list, sellOrders.getBitcoins(), 0);
 		
 		if(result == true) {
@@ -75,11 +81,17 @@ public class TransactBitcoinController {
 				BalanceEntity currentBalance = balanceRepository.findByBankAccountAndCurrency(current.getCustomer().getBankAccount(), current.getCurrency());
 				
 				BalanceEntity sellOrderBalance =  balanceRepository.findByBankAccountAndCurrency(sellOrders.getCustomer().getBankAccount(), current.getCurrency());
+				
+				
+				//if current is buy market order, then we will settle based on sell order amount
 				if(current.isMarketOrder()) {
 					currentBalance.setBalance(currentBalance.getBalance() - sellOrders.getAmount() * current.getBitcoins());
 					sellOrderBalance.setBalance(sellOrderBalance.getBalance() + sellOrders.getAmount() * current.getBitcoins()); 
 					
 				} else {
+					//if current is buy limit order but sell order is market order, then we will settle based on buy order amount
+					// else we will settle on sell order amounnt
+
 					if(sellOrders.isMarketOrder()) {
 						currentBalance.setBalance(currentBalance.getBalance() - current.getAmount() * current.getBitcoins());
 						sellOrderBalance.setBalance(sellOrderBalance.getBalance() + current.getAmount() * current.getBitcoins()); 
@@ -90,10 +102,14 @@ public class TransactBitcoinController {
 					}
 				}
 				
+				
+				
 				balanceRepository.save(currentBalance);
 				balanceRepository.save(sellOrderBalance);
 
 				
+				
+				//Bitcoin settlement
 				BalanceEntity bitcoinBalanceBuyer = balanceRepository.findByBankAccountAndCurrency(current.getCustomer().getBankAccount(), Currency.BITCOIN);
 				bitcoinBalanceBuyer.setBalance(bitcoinBalanceBuyer.getBalance() + current.getBitcoins());
 				balanceRepository.save(bitcoinBalanceBuyer);
@@ -104,43 +120,55 @@ public class TransactBitcoinController {
 				
 				current.setStatus(OrderStatus.FULFILLED);
 				
-				transactBitcoinRepository.save(current);
-				
-			
-				
-				
+				transactBitcoinRepository.save(current);			
 			}
 			
 			sellOrders.setStatus(OrderStatus.FULFILLED);
 			transactBitcoinRepository.save(sellOrders);
-
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 		} 
 			
 	}
 
 	private void settleBitcoinTransactions() {
+		
+		//This finds all open sell orders
 		List<TransactBitcoinEntity> transactions = transactBitcoinRepository.findByIsBuyAndStatus(false, OrderStatus.OPEN);
 
+		
+		//This is loop where we try to settle all sell orders
 		for(TransactBitcoinEntity current : transactions) {
 
+			
+			//Initialised the empty list for eligible buy orders based on balances, bidding, ask price
 			List<TransactBitcoinEntity> eligibleBuyOrders = new ArrayList<TransactBitcoinEntity>();
+			
+			
+			//This finds all open buy orders which will be run through eligibility criteria
 
 			List<TransactBitcoinEntity> allbuyOrders = transactBitcoinRepository.findByIsBuyAndStatusAndCurrency(true, OrderStatus.OPEN, current.getCurrency());
 		
 			
 
+			//This filters all buy orders whether a particular buy order can be considered or not
+			
+			
+			/*
+			 * If both sell and buy order are market orders, then current buy order won't be considered
+			 * 
+			 * If sell order is market order, then we will check the sufficient balance based on buy order max price
+			 * 
+			 * If sell order is limit order and but order is market order,, then we will check the sufficient balance based on sell order max price
+			 * 
+			 * If both sell order and buy order are limit orders, then we will check two things
+			 * 1. Amount of selling should be less than buying
+			 * 2. Sufficient balance based on sell order price
+			 * 
+			 * 
+			 */
 			for(TransactBitcoinEntity currentBuyOrder : allbuyOrders) {
 				
+				
+				//This checks whether current buy order is of same customer, then we will ignore current buy order
 				if(currentBuyOrder.getCustomer().getBankAccount().getId() == current.getCustomer().getBankAccount().getId())
 					continue;
 				
@@ -153,6 +181,9 @@ public class TransactBitcoinController {
 						if(balance.getBalance() >= currentBuyOrder.getAmount() * currentBuyOrder.getBitcoins()) 
 							eligibleBuyOrders.add(currentBuyOrder);
 					}	
+					
+					
+					
 				} else {
 					if(currentBuyOrder.isMarketOrder()  && balance.getBalance() >= current.getAmount() * currentBuyOrder.getBitcoins()) {
 						eligibleBuyOrders.add(currentBuyOrder);
@@ -162,6 +193,9 @@ public class TransactBitcoinController {
 					}		
 				}
 			}
+			
+			
+			//After we get eligible buy orders, we will try if we have correct combination of buy orders which can settle current sell order in full
 
 			tryToSettle(eligibleBuyOrders, current);
 		}
@@ -175,23 +209,34 @@ public class TransactBitcoinController {
 
 
 		if(bitcoinTransaction.isBuy()) {
+			
 			if(!bitcoinTransaction.isMarketOrder()) {
 				BalanceEntity balance = balanceRepository.findByBankAccountAndCurrency(customerEntity.getBankAccount(), bitcoinTransaction.getCurrency());
 				if(bitcoinTransaction.getBitcoins() * bitcoinTransaction.getAmount() > balance.getBalance()) {
-					Map<String, String> map = new HashMap<String, String>();
+					//This is the case where order is limit + buy order and you don;t have enough balance 
+					Map<String, String> errors = new HashMap<String, String>();
+					errors.put("err", "Not enough balance");
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body("Not enough balace");
+							.body(errors);
 				}
 			}
 		} else {
 			BalanceEntity balance = balanceRepository.findByBankAccountAndCurrency(customerEntity.getBankAccount(), Currency.BITCOIN);
-			if(bitcoinTransaction.getBitcoins() > balance.getBalance())
+			if(bitcoinTransaction.getBitcoins() > balance.getBalance()) {
+				
+				// This is the case where order is sell order annd you don't have enough bitcoins
+				Map<String, String> errors = new HashMap<String, String>();
+				errors.put("err", "Not enough balance");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body("Not enough balace");
+						.body(errors);
+			}
 		}
 
 		bitcoinTransaction.setCustomer(customerEntity);
 		TransactBitcoinEntity updatedEntity = transactBitcoinRepository.save(bitcoinTransaction);
+		
+		//After creating buy or sell order, we will call settle bitcoin transactions
+		
 		settleBitcoinTransactions();
 		return ResponseEntity.ok(updatedEntity);
 
