@@ -16,9 +16,8 @@ public class BalanceEntity {
     @Enumerated(EnumType.STRING)
     Currency currency = Currency.USD;
     @Min(0)
-    @Digits(integer=9, fraction=10)
-    BigDecimal balance = BigDecimal.valueOf(0);
-    @ManyToOne
+    Integer balance = 0;
+    @ManyToOne()
     BankAccountEntity bankAccount = null;
 
     public Long getId() {
@@ -37,11 +36,11 @@ public class BalanceEntity {
         this.currency = currency;
     }
 
-    public BigDecimal getBalance() {
+    public Integer getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(Integer balance) {
         this.balance = balance;
     }
 
