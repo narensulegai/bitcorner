@@ -5,6 +5,7 @@ import com.example.demo.model.BankAccountEntity;
 import com.example.demo.model.CustomerEntity;
 import com.example.demo.Currency;
 import com.example.demo.repository.BalanceRepository;
+import com.example.demo.repository.BankAccountRepository;
 import com.example.demo.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,9 @@ public class BankAccountController {
     
     @Autowired
     BalanceRepository balanceRepository; 
+    
+    @Autowired
+    BankAccountRepository bankAccountRepository; 
 
     @ResponseBody
     @GetMapping
@@ -39,16 +43,21 @@ public class BankAccountController {
     public BankAccountEntity updateBankAccount(@RequestBody @Valid BankAccountEntity bankAccountEntity) {
         CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
+        
+        
+        if(customerEntity.getBankAccount() != null)
+        	bankAccountEntity.setId(customerEntity.getBankAccount().getId());
 
         customerEntity.setBankAccount(bankAccountEntity);
-        customerRepository.save(customerEntity);
+        customerRepository.save(customerEntity);  
         
-        
-        if(balanceRepository.findByBankAccountId(bankAccountEntity.getId()) == null) {
+        CustomerEntity sameCustomer = customerRepository.findById(customerEntity.getId()).get();
+                
+        if(balanceRepository.findByBankAccountId(bankAccountEntity.getId()).size() == 0) {
         	for(Currency c: Currency.values()) {
                 BalanceEntity balanceEntity = new BalanceEntity();
-                balanceEntity.setBankAccount(bankAccountEntity);
-                balanceEntity.setBalance(BigDecimal.ZERO);
+                balanceEntity.setBankAccount(sameCustomer.getBankAccount());
+                balanceEntity.setBalance(0);
                 balanceEntity.setCurrency(c);
                 balanceRepository.save(balanceEntity);
             }
