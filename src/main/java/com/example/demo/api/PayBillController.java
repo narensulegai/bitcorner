@@ -1,5 +1,6 @@
 package com.example.demo.api;
 
+import com.example.demo.BillStatus;
 import com.example.demo.model.BalanceEntity;
 import com.example.demo.model.BillEntity;
 import com.example.demo.model.CustomerEntity;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/payBill")
@@ -67,6 +69,7 @@ public class PayBillController {
         else {
         	payerBalanceEntity.setBalance(payerBalance - billEntity.getAmount());
         	
+        	
         	// failed to save payer balance
     		if(balanceRepository.save(payerBalanceEntity) == null) {
             	errors.put("err", "Payer balance issue");
@@ -81,13 +84,28 @@ public class PayBillController {
     	BalanceEntity payeeBalanceEntity = balanceRepository.findByBankAccountAndCurrency(billEntity.getCustomer().getBankAccount(), billEntity.getCurrency());
     	Integer balance = payeeBalanceEntity.getBalance();
     	payeeBalanceEntity.setBalance(balance + billEntity.getAmount());
-		if(balanceRepository.save(payeeBalanceEntity) != null)
-			return ResponseEntity.ok("Transaction successful");
 		
-		errors.put("err", "Payee balance issue");
+    	if(balanceRepository.save(payeeBalanceEntity) == null) {
+			errors.put("err", "Payee balance issue");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(errors);
+		}
+    	Optional<BillEntity> payeeBillEntity = billRepository.findById(billEntity.getId());
+    	if(payeeBillEntity.get() != null) {
+    		payeeBillEntity.get().setStatus(BillStatus.PAID);
+    		
+    	}
+    	else {
+    		errors.put("err", "Bill status couldn't set");
+    		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    					.body(errors);
+    	}
+		if(billRepository.save(payeeBillEntity.get()) != null)
+			return ResponseEntity.ok("Transaction successful");
 		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(errors);
+		
     	
     }
 }
