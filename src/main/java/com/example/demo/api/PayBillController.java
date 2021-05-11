@@ -8,13 +8,17 @@ import com.example.demo.repository.BillRepository;
 import com.example.demo.repository.CustomerRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/payBill")
@@ -50,13 +54,40 @@ public class PayBillController {
     
     @ResponseBody
     @PutMapping
-    public BillEntity settleBill(@RequestBody @Valid BillEntity billEntity ) {
-    	
+    public ResponseEntity<?> settleBill(@RequestBody @Valid BillEntity billEntity) {
+    	// Payer adjust
+        CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        Map<String, String> errors = new HashMap<>();
+        BalanceEntity payerBalanceEntity = balanceRepository.findByBankAccountAndCurrency(customerEntity.getBankAccount(), billEntity.getCurrency());
+        Integer payerBalance = payerBalanceEntity.getBalance();
+        if( payerBalance < billEntity.getAmount()) {
+        	errors.put("err", "Not enough balance");
+        }
+        else {
+        	payerBalanceEntity.setBalance(payerBalance - billEntity.getAmount());
+        	
+        	// failed to save payer balance
+    		if(balanceRepository.save(payerBalanceEntity) == null) {
+            	errors.put("err", "Payer balance issue");
+    			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    						.body(errors);
+    		}
+        }
+        // bitcorner adjust
+    	// CustomerEntity bitcorner = customerRepository.findByEmail("bitcorner@gmail.com");
+        
     	// payee adjust
     	BalanceEntity payeeBalanceEntity = balanceRepository.findByBankAccountAndCurrency(billEntity.getCustomer().getBankAccount(), billEntity.getCurrency());
     	Integer balance = payeeBalanceEntity.getBalance();
     	payeeBalanceEntity.setBalance(balance + billEntity.getAmount());
-		return billRepository.save(billEntity);
+		if(balanceRepository.save(payeeBalanceEntity) != null)
+			return ResponseEntity.ok("Transaction successful");
+		
+		errors.put("err", "Payee balance issue");
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(errors);
     	
     }
 }
