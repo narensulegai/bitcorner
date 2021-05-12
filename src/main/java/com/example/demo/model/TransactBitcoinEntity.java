@@ -3,6 +3,8 @@ package com.example.demo.model;
 import com.example.demo.Currency;
 import com.example.demo.OrderStatus;
 
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 
@@ -17,7 +19,7 @@ public class TransactBitcoinEntity {
     CustomerEntity customer = null;
 
     @Min(0)
-    Integer amount = 0;
+    BigDecimal amount = BigDecimal.ZERO;
 
     @Min(0)
     int bitcoins = 0;
@@ -56,8 +58,6 @@ public class TransactBitcoinEntity {
         this.isBuy = isBuy;
     }
 
-    Integer minPrice = null;
-
     public Long getId() {
         return id;
     }
@@ -74,11 +74,11 @@ public class TransactBitcoinEntity {
         this.customer = customer;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -96,13 +96,5 @@ public class TransactBitcoinEntity {
 
     public void setMarketOrder(boolean marketOrder) {
         isMarketOrder = marketOrder;
-    }
-
-    public Integer getMinPrice() {
-        return minPrice;
-    }
-
-    public void setMinPrice(Integer minPrice) {
-        this.minPrice = minPrice;
     }
 }

@@ -9,6 +9,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -32,7 +34,7 @@ public class BillEntity {
     Currency currency = Currency.USD;
 
     @Min(value = 0, message = "Amount should be greater than 0")
-    int amount = 0;
+    BigDecimal amount = BigDecimal.ZERO;
 
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     @NotNull(message = "Due date cannot be empty")
@@ -89,11 +91,11 @@ public class BillEntity {
         this.description = description;
     }
 
-    public int getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
