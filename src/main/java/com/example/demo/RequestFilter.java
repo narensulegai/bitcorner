@@ -47,7 +47,7 @@ public class RequestFilter extends OncePerRequestFilter {
             authentication.setPrincipal(customerEntity);
             authentication.setCredential(decodedToken);
             if (!publicPaths.contains(request.getRequestURI())) {
-                boolean isAuthenticated = true && customerRepository.findByUid(uid) != null;
+                boolean isAuthenticated = decodedToken.isEmailVerified() && customerRepository.findByUid(uid) != null;
                 if (!isAuthenticated) {
                     response.sendError(403, "Not authorized");
                     return;
