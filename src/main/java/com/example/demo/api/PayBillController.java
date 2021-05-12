@@ -144,7 +144,7 @@ public class PayBillController {
     					.body(errors);
     	}
 		if(billRepository.save(payeeBillEntity.get()) != null)
-			return ResponseEntity.ok("Transaction successful");
+			return ResponseEntity.ok(payerBalanceEntity);
 		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(errors);
