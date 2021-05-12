@@ -41,8 +41,7 @@ public class SendBillController {
     public BillEntity update(@RequestBody @Valid BillEntity billEntity) {
         CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
-
-        billEntity.setCustomer(customerEntity);
+        
         return billRepository.save(billEntity);
     }
 }
