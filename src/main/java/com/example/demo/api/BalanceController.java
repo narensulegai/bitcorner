@@ -1,8 +1,13 @@
 package com.example.demo.api;
 
+import com.example.demo.Currency;
 import com.example.demo.model.BalanceEntity;
 import com.example.demo.model.CustomerEntity;
+import com.example.demo.model.TransactBitcoinEntity;
 import com.example.demo.repository.BalanceRepository;
+import com.example.demo.repository.TransactBitcoinRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +26,9 @@ public class BalanceController {
 
     @Autowired
     BalanceRepository balanceRepository;
+
+    @Autowired
+    TransactBitcoinRepository transactBitcoinRepository;
 
     @ResponseBody
     @GetMapping
@@ -48,14 +56,30 @@ public class BalanceController {
     
     @ResponseBody
     @GetMapping(path = "/rates")
-    public Map<String, Object> getExchangeRates()  {
+    public JsonNode getExchangeRates() throws JsonProcessingException {
+        System.out.println("Inside API method...");
     	ObjectMapper mapper = new ObjectMapper();
-    	Map<String, Object> rateMap = null;
+    	Map<String, Map<String, Map<String, Double>>> rateMap = null;
     	try {
-    	   rateMap = mapper.readValue(ClassLoader.getSystemClassLoader().getResourceAsStream("json/exchangeRates.json"), Map.class);
+    	    rateMap = mapper.readValue(ClassLoader.getSystemClassLoader().getResourceAsStream("json/exchangeRates.json"), Map.class);
+
+            Map<String, Map<String, Double>> current = rateMap.get("BITCOIN");
+            Map<String, Double> currentRates = current.get("rates");
+
+            for (Currency currency : Currency.values()) {
+                TransactBitcoinEntity transactBitcoinEntity = transactBitcoinRepository.findFirstByCurrencyAndIsMarketOrderOrderByIdDesc(currency, false);
+                if(transactBitcoinEntity != null) {
+                    double rateAmount = (double) transactBitcoinEntity.getAmount();
+                    currentRates.put(currency.toString(), rateAmount);
+                    Map<String, Map<String, Double>> parentCurrency = rateMap.get(currency.toString());
+                    Map<String, Double> parentRates = parentCurrency.get("rates");
+                    parentRates.put("BITCOIN", 1/rateAmount);
+                }
+            }
     	} catch (IOException e) {
     	    e.printStackTrace();
     	}
-        return rateMap;
+        String json = new ObjectMapper().writeValueAsString(rateMap);
+    	return new ObjectMapper().readTree(json);
     }
 }
