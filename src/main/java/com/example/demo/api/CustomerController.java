@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/customer")
+@RequestMapping(path = "/api/customer")
 public class CustomerController {
 
     @Autowired

@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/sendBill")
+@RequestMapping(path = "/api/sendBill")
 public class SendBillController {
 
     @Autowired

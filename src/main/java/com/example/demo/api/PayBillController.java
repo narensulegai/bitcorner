@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/payBill")
+@RequestMapping(path = "/api/payBill")
 public class PayBillController {
 
     @Autowired

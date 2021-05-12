@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/bankAccount")
+@RequestMapping(path = "/api/bankAccount")
 public class BankAccountController {
 
     @Autowired

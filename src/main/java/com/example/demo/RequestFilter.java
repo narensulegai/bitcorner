@@ -28,39 +28,40 @@ public class RequestFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+        // Only authenticate /api/*
+        if (request.getRequestURI().startsWith("/api/")) {
+            final String requestToken = request.getHeader("Authorization");
 
-        final String requestToken = request.getHeader("Authorization");
-
-        if (requestToken == null) {
-            response.sendError(403, "Authorization header is missing");
-            return;
-        }
-        // Public paths
-        Set<String> publicPaths = Set.of("/customer");
-        try {
-            UserAuthentication authentication = new UserAuthentication();
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(requestToken);
-            String uid = decodedToken.getUid();
-            authentication.setName(uid);
-
-            CustomerEntity customerEntity = customerRepository.findByUid(uid);
-            authentication.setPrincipal(customerEntity);
-            authentication.setCredential(decodedToken);
-            if (!publicPaths.contains(request.getRequestURI())) {
-                boolean isAuthenticated = decodedToken.isEmailVerified() && customerRepository.findByUid(uid) != null;
-                if (!isAuthenticated) {
-                    response.sendError(403, "Not authorized");
-                    return;
-                }
+            if (requestToken == null) {
+                response.sendError(403, "Authorization header is missing");
+                return;
             }
-            authentication.setAuthenticated(true);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Public paths
+            Set<String> publicPaths = Set.of("/api/customer");
+            try {
+                UserAuthentication authentication = new UserAuthentication();
+                FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(requestToken);
+                String uid = decodedToken.getUid();
+                authentication.setName(uid);
 
-        } catch (FirebaseAuthException e) {
-            response.sendError(403, "Authorization token is invalid/expired");
-            return;
+                CustomerEntity customerEntity = customerRepository.findByUid(uid);
+                authentication.setPrincipal(customerEntity);
+                authentication.setCredential(decodedToken);
+                if (!publicPaths.contains(request.getRequestURI())) {
+                    boolean isAuthenticated = decodedToken.isEmailVerified() && customerRepository.findByUid(uid) != null;
+                    if (!isAuthenticated) {
+                        response.sendError(403, "Not authorized");
+                        return;
+                    }
+                }
+                authentication.setAuthenticated(true);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            } catch (FirebaseAuthException e) {
+                response.sendError(403, "Authorization token is invalid/expired");
+                return;
+            }
         }
-
         filterChain.doFilter(request, response);
     }
 }
