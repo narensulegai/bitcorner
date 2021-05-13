@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/prevailingRates")
+@RequestMapping(path = "/api/prevailingRates")
 public class PrevailingRatesController {
 
     @Autowired

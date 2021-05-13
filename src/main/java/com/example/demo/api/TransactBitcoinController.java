@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/transactBitcoin")
+@RequestMapping(path = "/api/transactBitcoin")
 public class TransactBitcoinController {
 
 	@Autowired

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/balance")
+@RequestMapping(path = "/api/balance")
 public class BalanceController {
 
     @Autowired
@@ -58,7 +58,6 @@ public class BalanceController {
     @ResponseBody
     @GetMapping(path = "/rates")
     public JsonNode getExchangeRates() throws JsonProcessingException {
-        System.out.println("Inside API method...");
     	ObjectMapper mapper = new ObjectMapper();
     	Map<String, Map<String, Map<String, BigDecimal>>> rateMap = null;
     	try {
