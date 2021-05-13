@@ -30,6 +30,9 @@ public class BalanceController {
 
     @Autowired
     TransactBitcoinRepository transactBitcoinRepository;
+    //    Escaped using
+    //    https://codebeautify.org/json-escape-unescape
+    String exchangeRate = "{\"USD\" : {\"rates\" : {     \"INR\": 75.014195,     \"RMB\": 0.164322,     \"EUR\": 0.806942,     \"GBP\": 0.719154, \"BITCOIN\": 0.0000179, \"USD\": 1     }}, \"EUR\" : {\"rates\" : {     \"INR\": 89.163887,     \"RMB\": 7.824776,     \"USD\": 1.216459,     \"GBP\": 0.870096, \"BITCOIN\": 0.0000217, \"EUR\": 1}},\"INR\" : {\"rates\" : {     \"EUR\": 0.011215,     \"RMB\": 0.087760,     \"USD\": 0.013643,     \"GBP\": 0.009762, \"BITCOIN\": 0.000000244, \"INR\": 1 }},\"GBP\" : {\"rates\" : {     \"INR\": 102.430618,     \"RMB\": 8.989342,     \"USD\": 1.397490,     \"EUR\": 1.148825, \"BITCOIN\": 0.0000253, \"GBP\": 1 }},\"RMB\" : {\"rates\" : {     \"INR\": 11.394643,     \"EUR\": 0.127799,     \"USD\": 0.155461,     \"GBP\": 0.111246, \"BITCOIN\": 0.00000279, \"RMB\": 1 }},\"BITCOIN\" : {\"rates\" : {\"USD\": 56000.34,\"INR\": 4103026.50,\"EUR\": 46149.26,\"RMB\": 358190.20,\"GBP\": 39513.69,\"BITCOIN\": 1}},\"ServiceRate\" : 0.0001}";
 
     @ResponseBody
     @GetMapping
@@ -61,7 +64,8 @@ public class BalanceController {
     	ObjectMapper mapper = new ObjectMapper();
     	Map<String, Map<String, Map<String, BigDecimal>>> rateMap = null;
     	try {
-    	    rateMap = mapper.readValue(ClassLoader.getSystemClassLoader().getResourceAsStream("src/main/resources/json/exchangeRates.json"), Map.class);
+//            rateMap = mapper.readValue(ClassLoader.getSystemClassLoader().getResourceAsStream("src/main/resources/json/exchangeRates.json"), Map.class);
+    	    rateMap = mapper.readValue(exchangeRate, Map.class);
 
             Map<String, Map<String, BigDecimal>> current = rateMap.get("BITCOIN");
             Map<String, BigDecimal> currentRates = current.get("rates");
