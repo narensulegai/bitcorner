@@ -11,5 +11,5 @@ import java.util.List;
 public interface BalanceRepository extends CrudRepository<BalanceEntity, Long> {
     public List<BalanceEntity> findByBankAccountId(Long id);
     public BalanceEntity findByBankAccountAndCurrency(BankAccountEntity account, Currency currency);
-
+    public List<BalanceEntity> findByBankAccount(BankAccountEntity account);
 }

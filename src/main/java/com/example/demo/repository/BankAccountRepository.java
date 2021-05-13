@@ -5,5 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 
 public interface BankAccountRepository extends CrudRepository<BankAccountEntity, Long> {
+	
+	BankAccountEntity findByAccountNumber(String account);
    
 }
