@@ -14,5 +14,7 @@ public interface TransactBitcoinRepository extends CrudRepository<TransactBitcoi
     public List<TransactBitcoinEntity> findAll();
     public List<TransactBitcoinEntity> findByStatus(OrderStatus status);
     public TransactBitcoinEntity findFirstByCurrencyAndIsMarketOrderOrderByIdDesc(Currency currency, Boolean isMarketOrder);
+    public TransactBitcoinEntity findFirstByCurrencyAndIsBuyAndIsMarketOrderOrderByIdDesc(Currency currency, Boolean buyOrder, boolean marketOrder);
+
 
 }

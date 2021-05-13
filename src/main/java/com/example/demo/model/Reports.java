@@ -7,8 +7,23 @@ public class Reports {
 	int totalOrdersCreated;
 	int noOfOrdersFulfilled;
 	List<BalanceEntity> bitcornerBalance;
+	List<TransactBitcoinEntity> bidPrice;
+	List<TransactBitcoinEntity> askPrice;
+
 	
 	
+	public List<TransactBitcoinEntity> getBidPrice() {
+		return bidPrice;
+	}
+	public void setBidPrice(List<TransactBitcoinEntity> bidPrice) {
+		this.bidPrice = bidPrice;
+	}
+	public List<TransactBitcoinEntity> getAskPrice() {
+		return askPrice;
+	}
+	public void setAskPrice(List<TransactBitcoinEntity> askPrice) {
+		this.askPrice = askPrice;
+	}
 	public int getTotalCustomers() {
 		return totalCustomers;
 	}
