@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -59,21 +60,21 @@ public class BalanceController {
     public JsonNode getExchangeRates() throws JsonProcessingException {
         System.out.println("Inside API method...");
     	ObjectMapper mapper = new ObjectMapper();
-    	Map<String, Map<String, Map<String, Double>>> rateMap = null;
+    	Map<String, Map<String, Map<String, BigDecimal>>> rateMap = null;
     	try {
     	    rateMap = mapper.readValue(ClassLoader.getSystemClassLoader().getResourceAsStream("json/exchangeRates.json"), Map.class);
 
-            Map<String, Map<String, Double>> current = rateMap.get("BITCOIN");
-            Map<String, Double> currentRates = current.get("rates");
+            Map<String, Map<String, BigDecimal>> current = rateMap.get("BITCOIN");
+            Map<String, BigDecimal> currentRates = current.get("rates");
 
             for (Currency currency : Currency.values()) {
                 TransactBitcoinEntity transactBitcoinEntity = transactBitcoinRepository.findFirstByCurrencyAndIsMarketOrderOrderByIdDesc(currency, false);
                 if(transactBitcoinEntity != null) {
-                    double rateAmount = (double) transactBitcoinEntity.getAmount();
+                    BigDecimal rateAmount = transactBitcoinEntity.getAmount();
                     currentRates.put(currency.toString(), rateAmount);
-                    Map<String, Map<String, Double>> parentCurrency = rateMap.get(currency.toString());
-                    Map<String, Double> parentRates = parentCurrency.get("rates");
-                    parentRates.put("BITCOIN", 1/rateAmount);
+                    Map<String, Map<String, BigDecimal>> parentCurrency = rateMap.get(currency.toString());
+                    Map<String, BigDecimal> parentRates = parentCurrency.get("rates");
+                    parentRates.put("BITCOIN", BigDecimal.valueOf(1).divide(rateAmount));
                 }
             }
     	} catch (IOException e) {
