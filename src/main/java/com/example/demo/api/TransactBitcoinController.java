@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,20 +86,23 @@ public class TransactBitcoinController {
 				
 				//if current is buy market order, then we will settle based on sell order amount
 				if(current.isMarketOrder()) {
-					currentBalance.setBalance(currentBalance.getBalance() - sellOrders.getAmount() * current.getBitcoins());
-					sellOrderBalance.setBalance(sellOrderBalance.getBalance() + sellOrders.getAmount() * current.getBitcoins()); 
+					BigDecimal bitcoinAmount = sellOrders.getAmount().multiply(BigDecimal.valueOf(current.getBitcoins()));
+					currentBalance.setBalance(currentBalance.getBalance().subtract(bitcoinAmount));
+					sellOrderBalance.setBalance(sellOrderBalance.getBalance().add(bitcoinAmount)); 
 					
 				} else {
 					//if current is buy limit order but sell order is market order, then we will settle based on buy order amount
 					// else we will settle on sell order amounnt
 
 					if(sellOrders.isMarketOrder()) {
-						currentBalance.setBalance(currentBalance.getBalance() - current.getAmount() * current.getBitcoins());
-						sellOrderBalance.setBalance(sellOrderBalance.getBalance() + current.getAmount() * current.getBitcoins()); 
+						BigDecimal currentAmount = current.getAmount().multiply(BigDecimal.valueOf(current.getBitcoins()));
+						currentBalance.setBalance(currentBalance.getBalance().subtract(currentAmount));
+						sellOrderBalance.setBalance(sellOrderBalance.getBalance().add(currentAmount)); 
 
 					} else {
-						currentBalance.setBalance(currentBalance.getBalance() - sellOrders.getAmount() * current.getBitcoins());
-						sellOrderBalance.setBalance(sellOrderBalance.getBalance() + sellOrders.getAmount() * current.getBitcoins()); 
+						BigDecimal bitcoinAmount = sellOrders.getAmount().multiply(BigDecimal.valueOf(current.getBitcoins()));
+						currentBalance.setBalance(currentBalance.getBalance().subtract(bitcoinAmount));
+						sellOrderBalance.setBalance(sellOrderBalance.getBalance().add(bitcoinAmount)); 
 					}
 				}
 				
@@ -111,19 +115,33 @@ public class TransactBitcoinController {
 				
 				//Bitcoin settlement
 				BalanceEntity bitcoinBalanceBuyer = balanceRepository.findByBankAccountAndCurrency(current.getCustomer().getBankAccount(), Currency.BITCOIN);
-				bitcoinBalanceBuyer.setBalance(bitcoinBalanceBuyer.getBalance() + current.getBitcoins());
+				bitcoinBalanceBuyer.setBalance(bitcoinBalanceBuyer.getBalance().add((BigDecimal.valueOf(current.getBitcoins()))));
 				balanceRepository.save(bitcoinBalanceBuyer);
 				
 				BalanceEntity bitcoinBalanceSeller = balanceRepository.findByBankAccountAndCurrency(sellOrders.getCustomer().getBankAccount(), Currency.BITCOIN);
-				bitcoinBalanceSeller.setBalance(bitcoinBalanceSeller.getBalance() - current.getBitcoins());
+				bitcoinBalanceSeller.setBalance(bitcoinBalanceSeller.getBalance().subtract((BigDecimal.valueOf(current.getBitcoins()))));
 				balanceRepository.save(bitcoinBalanceSeller);
 				
 				current.setStatus(OrderStatus.FULFILLED);
+				try {
+					Email.sendmail(current.getCustomer().getEmail().toString(), "Hey, we hope you are staying safe, "
+							+ "Your order with id " + current.getId() + " has been fulfilled. Check portal for updates");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 				transactBitcoinRepository.save(current);			
 			}
 			
 			sellOrders.setStatus(OrderStatus.FULFILLED);
+			try {
+				Email.sendmail(sellOrders.getCustomer().getEmail().toString(), "Hey, we hope you are staying safe, "
+						+ "Your order with id " + sellOrders.getId() + " has been fulfilled. Check portal for updates");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			transactBitcoinRepository.save(sellOrders);
 		} 
 			
@@ -177,17 +195,22 @@ public class TransactBitcoinController {
 
 
 				if(current.isMarketOrder()) {
-					if(!currentBuyOrder.isMarketOrder()) {    					
-						if(balance.getBalance() >= currentBuyOrder.getAmount() * currentBuyOrder.getBitcoins()) 
+					if(!currentBuyOrder.isMarketOrder()) {    	
+						BigDecimal buyAmount = currentBuyOrder.getAmount().multiply(BigDecimal.valueOf(currentBuyOrder.getBitcoins()));
+						if(balance.getBalance().compareTo(buyAmount) >= 0)
 							eligibleBuyOrders.add(currentBuyOrder);
 					}	
 					
 					
 					
 				} else {
-					if(currentBuyOrder.isMarketOrder()  && balance.getBalance() >= current.getAmount() * currentBuyOrder.getBitcoins()) {
+
+					BigDecimal buyAmount = current.getAmount().multiply(BigDecimal.valueOf(currentBuyOrder.getBitcoins()));
+					if(currentBuyOrder.isMarketOrder()  && balance.getBalance().compareTo(buyAmount) >= 0) {
 						eligibleBuyOrders.add(currentBuyOrder);
-					} else if(!currentBuyOrder.isMarketOrder() && currentBuyOrder.getAmount() >= current.getAmount() && balance.getBalance() >= current.getAmount() * currentBuyOrder.getBitcoins()) {
+					} else if(!currentBuyOrder.isMarketOrder() 
+							&& currentBuyOrder.getAmount().compareTo(current.getAmount()) >= 0 
+							&& balance.getBalance().compareTo(buyAmount) >= 0) {
 
 						eligibleBuyOrders.add(currentBuyOrder);
 					}		
@@ -203,7 +226,7 @@ public class TransactBitcoinController {
 
 	@ResponseBody
 	@PostMapping
-	public ResponseEntity<?> update(@RequestBody @Valid TransactBitcoinEntity bitcoinTransaction) {
+	public ResponseEntity<?> update(@RequestBody @Valid TransactBitcoinEntity bitcoinTransaction) throws Exception {
 		CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
 				.getAuthentication().getPrincipal();
 
@@ -212,7 +235,7 @@ public class TransactBitcoinController {
 			
 			if(!bitcoinTransaction.isMarketOrder()) {
 				BalanceEntity balance = balanceRepository.findByBankAccountAndCurrency(customerEntity.getBankAccount(), bitcoinTransaction.getCurrency());
-				if(bitcoinTransaction.getBitcoins() * bitcoinTransaction.getAmount() > balance.getBalance()) {
+				if(bitcoinTransaction.getAmount().multiply(BigDecimal.valueOf(bitcoinTransaction.getBitcoins())).compareTo(balance.getBalance()) >= 0) {
 					//This is the case where order is limit + buy order and you don;t have enough balance 
 					Map<String, String> errors = new HashMap<String, String>();
 					errors.put("err", "Not enough balance");
@@ -222,7 +245,7 @@ public class TransactBitcoinController {
 			}
 		} else {
 			BalanceEntity balance = balanceRepository.findByBankAccountAndCurrency(customerEntity.getBankAccount(), Currency.BITCOIN);
-			if(bitcoinTransaction.getBitcoins() > balance.getBalance()) {
+			if(BigDecimal.valueOf(bitcoinTransaction.getBitcoins()).compareTo(balance.getBalance()) >= 0) {
 				
 				// This is the case where order is sell order annd you don't have enough bitcoins
 				Map<String, String> errors = new HashMap<String, String>();
@@ -238,6 +261,9 @@ public class TransactBitcoinController {
 		//After creating buy or sell order, we will call settle bitcoin transactions
 		
 		settleBitcoinTransactions();
+		
+		Email.sendmail(bitcoinTransaction.getCustomer().getEmail().toString(), "Hey, we hope you are staying safe, "
+				+ "Your order with id " + bitcoinTransaction.getId() + " has been placed. Check portal for updates");
 		return ResponseEntity.ok(updatedEntity);
 
 

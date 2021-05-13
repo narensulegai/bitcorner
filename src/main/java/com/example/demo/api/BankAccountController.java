@@ -57,7 +57,7 @@ public class BankAccountController {
         	for(Currency c: Currency.values()) {
                 BalanceEntity balanceEntity = new BalanceEntity();
                 balanceEntity.setBankAccount(sameCustomer.getBankAccount());
-                balanceEntity.setBalance(0);
+                balanceEntity.setBalance(BigDecimal.ZERO);
                 balanceEntity.setCurrency(c);
                 balanceRepository.save(balanceEntity);
             }

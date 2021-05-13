@@ -72,18 +72,18 @@ public class PayBillController {
 
         // old entity before settling bill
         BillEntity oldBillEntity = billRepository.findById(billEntity.getId()).get();
-        double serviceFee = 0;
+        BigDecimal serviceFee = BigDecimal.ZERO;
         if(oldBillEntity.getCurrency() != billEntity.getCurrency()) {
-            serviceFee = billEntity.getAmount() * 0.0001;
+             serviceFee = billEntity.getAmount().multiply(BigDecimal.valueOf(0.0001));
         }
         Map<String, String> errors = new HashMap<>();
         BalanceEntity payerBalanceEntity = balanceRepository.findByBankAccountAndCurrency(customerEntity.getBankAccount(), billEntity.getCurrency());
-        Integer payerBalance = payerBalanceEntity.getBalance();
-        if( payerBalance < billEntity.getAmount()) {
+        BigDecimal payerBalance = payerBalanceEntity.getBalance();
+        if( payerBalance.compareTo(billEntity.getAmount()) == -1) {
         	errors.put("err", "Not enough balance");
         }
         else {
-        	payerBalanceEntity.setBalance(payerBalance - billEntity.getAmount() - (int) Math.ceil(serviceFee));
+        	payerBalanceEntity.setBalance(payerBalance.subtract(billEntity.getAmount()).subtract(serviceFee));
         	
         	
         	// failed to save payer balance
@@ -117,21 +117,22 @@ public class PayBillController {
             	for(Currency c: Currency.values()) {
                     BalanceEntity balanceEntity = new BalanceEntity();
                     balanceEntity.setBankAccount(bitcorner.getBankAccount());
-                    balanceEntity.setBalance(0);
+                    balanceEntity.setBalance(BigDecimal.ZERO);
                     balanceEntity.setCurrency(c);
                     balanceRepository.save(balanceEntity);
                 }
             }
         }
         BalanceEntity bitcornerBalanceEntity = balanceRepository.findByBankAccountAndCurrency(bitcorner.getBankAccount(), billEntity.getCurrency());
-        Integer bitcornerBalance = bitcornerBalanceEntity.getBalance();
-        bitcornerBalanceEntity.setBalance(bitcornerBalance + (int) Math.ceil(serviceFee));
+        BigDecimal bitcornerBalance = bitcornerBalanceEntity.getBalance();
+        bitcornerBalanceEntity.setBalance(bitcornerBalance.add(serviceFee));
         balanceRepository.save(bitcornerBalanceEntity);
         
     	// payee adjust
+        
     	BalanceEntity payeeBalanceEntity = balanceRepository.findByBankAccountAndCurrency(billEntity.getCustomer().getBankAccount(), oldBillEntity.getCurrency());
-    	Integer payeeBalance = payeeBalanceEntity.getBalance();
-    	payeeBalanceEntity.setBalance(payeeBalance + oldBillEntity.getAmount());
+    	BigDecimal payeeBalance = payeeBalanceEntity.getBalance();
+    	payeeBalanceEntity.setBalance(payeeBalance.add(oldBillEntity.getAmount()));
 		
     	if(balanceRepository.save(payeeBalanceEntity) == null) {
 			errors.put("err", "Payee balance issue");
