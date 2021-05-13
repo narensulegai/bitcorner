@@ -123,11 +123,25 @@ public class TransactBitcoinController {
 				balanceRepository.save(bitcoinBalanceSeller);
 				
 				current.setStatus(OrderStatus.FULFILLED);
+				try {
+					Email.sendmail(current.getCustomer().getEmail().toString(), "Hey, we hope you are staying safe, "
+							+ "Your order with id " + current.getId() + " has been fulfilled. Check portal for updates");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 				transactBitcoinRepository.save(current);			
 			}
 			
 			sellOrders.setStatus(OrderStatus.FULFILLED);
+			try {
+				Email.sendmail(sellOrders.getCustomer().getEmail().toString(), "Hey, we hope you are staying safe, "
+						+ "Your order with id " + sellOrders.getId() + " has been fulfilled. Check portal for updates");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			transactBitcoinRepository.save(sellOrders);
 		} 
 			
@@ -212,7 +226,7 @@ public class TransactBitcoinController {
 
 	@ResponseBody
 	@PostMapping
-	public ResponseEntity<?> update(@RequestBody @Valid TransactBitcoinEntity bitcoinTransaction) {
+	public ResponseEntity<?> update(@RequestBody @Valid TransactBitcoinEntity bitcoinTransaction) throws Exception {
 		CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
 				.getAuthentication().getPrincipal();
 
@@ -247,6 +261,9 @@ public class TransactBitcoinController {
 		//After creating buy or sell order, we will call settle bitcoin transactions
 		
 		settleBitcoinTransactions();
+		
+		Email.sendmail(bitcoinTransaction.getCustomer().getEmail().toString(), "Hey, we hope you are staying safe, "
+				+ "Your order with id " + bitcoinTransaction.getId() + " has been placed. Check portal for updates");
 		return ResponseEntity.ok(updatedEntity);
 
 
