@@ -18,6 +18,7 @@ public class TransactBitcoinEntity {
     @ManyToOne
     CustomerEntity customer = null;
 
+    @Column(nullable = true)
     @Min(0)
     BigDecimal amount = BigDecimal.ZERO;
 

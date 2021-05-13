@@ -70,7 +70,12 @@ public class PayBillController {
         CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        BigDecimal serviceFee = billEntity.getAmount().multiply(BigDecimal.valueOf(0.0001));
+        // old entity before settling bill
+        BillEntity oldBillEntity = billRepository.findById(billEntity.getId()).get();
+        BigDecimal serviceFee = BigDecimal.ZERO;
+        if(oldBillEntity.getCurrency() != billEntity.getCurrency()) {
+             serviceFee = billEntity.getAmount().multiply(BigDecimal.valueOf(0.0001));
+        }
         Map<String, String> errors = new HashMap<>();
         BalanceEntity payerBalanceEntity = balanceRepository.findByBankAccountAndCurrency(customerEntity.getBankAccount(), billEntity.getCurrency());
         BigDecimal payerBalance = payerBalanceEntity.getBalance();
@@ -124,9 +129,10 @@ public class PayBillController {
         balanceRepository.save(bitcornerBalanceEntity);
         
     	// payee adjust
-    	BalanceEntity payeeBalanceEntity = balanceRepository.findByBankAccountAndCurrency(billEntity.getCustomer().getBankAccount(), billEntity.getCurrency());
+        
+    	BalanceEntity payeeBalanceEntity = balanceRepository.findByBankAccountAndCurrency(billEntity.getCustomer().getBankAccount(), oldBillEntity.getCurrency());
     	BigDecimal payeeBalance = payeeBalanceEntity.getBalance();
-    	payeeBalanceEntity.setBalance(payeeBalance.add(billEntity.getAmount()));
+    	payeeBalanceEntity.setBalance(payeeBalance.add(oldBillEntity.getAmount()));
 		
     	if(balanceRepository.save(payeeBalanceEntity) == null) {
 			errors.put("err", "Payee balance issue");
