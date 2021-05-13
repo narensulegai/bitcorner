@@ -61,7 +61,7 @@ public class BalanceController {
     	ObjectMapper mapper = new ObjectMapper();
     	Map<String, Map<String, Map<String, BigDecimal>>> rateMap = null;
     	try {
-    	    rateMap = mapper.readValue(ClassLoader.getSystemClassLoader().getResourceAsStream("json/exchangeRates.json"), Map.class);
+    	    rateMap = mapper.readValue(ClassLoader.getSystemClassLoader().getResourceAsStream("src/main/resources/json/exchangeRates.json"), Map.class);
 
             Map<String, Map<String, BigDecimal>> current = rateMap.get("BITCOIN");
             Map<String, BigDecimal> currentRates = current.get("rates");
