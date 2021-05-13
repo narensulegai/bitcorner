@@ -24,7 +24,7 @@ public class Email {
 		      }
 		   });
 		   Message msg = new MimeMessage(session);
-		   msg.setFrom(new InternetAddress("singhalakash.bvcoe@gmail.com", false));
+		   msg.setFrom(new InternetAddress("", false));
 
 		   msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 		   msg.setSubject("bitcorner update");
