@@ -76,6 +76,14 @@ public class TransactBitcoinController {
 		boolean result = helper(buyOrders, list, sellOrders.getBitcoins(), 0);
 		
 		if(result == true) {
+			BalanceEntity sellOrder =  balanceRepository.findByBankAccountAndCurrency(sellOrders.getCustomer().getBankAccount(), sellOrders.getCurrency());
+			
+			BigDecimal tradingFees = BigDecimal.valueOf(0.0001).multiply(BigDecimal.valueOf(sellOrders.getBitcoins()));
+			BigDecimal amountToBeDeducted = tradingFees.compareTo(BigDecimal.valueOf(1)) >= 0 ? BigDecimal.valueOf(1) : tradingFees;
+			
+			sellOrder.setBalance(amountToBeDeducted);
+			balanceRepository.save(sellOrder);
+
 			
 			for(TransactBitcoinEntity current : list) {
 				
