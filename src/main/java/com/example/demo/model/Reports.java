@@ -7,23 +7,41 @@ public class Reports {
 	int totalOrdersCreated;
 	int noOfOrdersFulfilled;
 	List<BalanceEntity> bitcornerBalance;
-	List<TransactBitcoinEntity> bidPrice;
-	List<TransactBitcoinEntity> askPrice;
+    Prices lastestPrices;
+    
+	List<TransactBitcoinEntity> transactions;
+	List<BalanceEntity> balances;
+	List<BillEntity> bills;
+
+
 
 	
 	
-	public List<TransactBitcoinEntity> getBidPrice() {
-		return bidPrice;
+	public List<TransactBitcoinEntity> getTransactions() {
+		return transactions;
 	}
-	public void setBidPrice(List<TransactBitcoinEntity> bidPrice) {
-		this.bidPrice = bidPrice;
+	public void setTransactions(List<TransactBitcoinEntity> transactions) {
+		this.transactions = transactions;
 	}
-	public List<TransactBitcoinEntity> getAskPrice() {
-		return askPrice;
+	public List<BalanceEntity> getBalances() {
+		return balances;
 	}
-	public void setAskPrice(List<TransactBitcoinEntity> askPrice) {
-		this.askPrice = askPrice;
+	public void setBalances(List<BalanceEntity> balances) {
+		this.balances = balances;
 	}
+	public List<BillEntity> getBills() {
+		return bills;
+	}
+	public void setBills(List<BillEntity> bills) {
+		this.bills = bills;
+	}
+	public Prices getLastestPrices() {
+		return lastestPrices;
+	}
+	public void setLastestPrices(Prices lastestPrices) {
+		this.lastestPrices = lastestPrices;
+	}
+	
 	public int getTotalCustomers() {
 		return totalCustomers;
 	}

@@ -4,13 +4,19 @@ import com.example.demo.Currency;
 import com.example.demo.OrderStatus;
 import com.example.demo.model.BalanceEntity;
 import com.example.demo.model.BankAccountEntity;
+import com.example.demo.model.BillEntity;
+import com.example.demo.model.CustomerEntity;
+import com.example.demo.model.Prices;
 import com.example.demo.model.Reports;
 import com.example.demo.model.TransactBitcoinEntity;
 import com.example.demo.repository.BalanceRepository;
 import com.example.demo.repository.BankAccountRepository;
+import com.example.demo.repository.BillRepository;
 import com.example.demo.repository.CustomerRepository;
+import com.example.demo.repository.PriceRepository;
 import com.example.demo.repository.TransactBitcoinRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -33,9 +39,18 @@ public class ReportingController {
 	@Autowired
 	BankAccountRepository bankAccountRepository;
 
+	@Autowired
+	PriceRepository priceRepository;
+	
+	@Autowired
+	BillRepository billRepository;
+
 	@ResponseBody
 	@GetMapping
 	public Reports get() {    	
+		CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
+				.getAuthentication().getPrincipal();
+
 
 		int totalOrders = transactBitcoinRepository.findAll().size();
 
@@ -51,26 +66,29 @@ public class ReportingController {
 			balance = balanceRepository.findByBankAccount(bitcornerAccount);
 
 		}
-		List<TransactBitcoinEntity> askPrices = new ArrayList<TransactBitcoinEntity>();
-
-		for(Currency currency : Currency.values()) {
-
-			askPrices.add(transactBitcoinRepository.findFirstByCurrencyAndIsBuyAndIsMarketOrderOrderByIdDesc(currency, true, false));
-		}
 		
-		List<TransactBitcoinEntity> bidPrices = new ArrayList<TransactBitcoinEntity>();
-
-		for(Currency currency : Currency.values()) {
-			bidPrices.add(transactBitcoinRepository.findFirstByCurrencyAndIsBuyAndIsMarketOrderOrderByIdDesc(currency, false, false));
-		}
+		List<Prices> prices = priceRepository.findAll();
+		
+		Prices price = null;
+		
+		if(prices.size() != 0) 
+			price = prices.get(0);
+		
+		List<TransactBitcoinEntity> transactions = transactBitcoinRepository.findByCustomerId(customerEntity.getId());
+		List<BillEntity> bills = billRepository.findByCustomerId(customerEntity.getId());
+		List<BalanceEntity> balances = balanceRepository.findByBankAccountId(customerEntity.getBankAccount().getId());
+		
 
 		Reports report = new Reports();
 		report.setBitcornerBalance(balance);
 		report.setNoOfOrdersFulfilled(totalFullfilledOrders);
 		report.setTotalOrdersCreated(totalOrders);
 		report.setTotalCustomers(customers);
-		report.setAskPrice(askPrices);
-		report.setBidPrice(bidPrices);
+		report.setLastestPrices(price);
+		report.setTransactions(transactions);
+		report.setBills(bills);
+		report.setBalances(balances);
+
 
 		return report;
 
