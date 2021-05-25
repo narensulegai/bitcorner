@@ -18,6 +18,7 @@ import javax.validation.Valid;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +78,8 @@ public class BalanceController {
                     currentRates.put(currency.toString(), rateAmount);
                     Map<String, Map<String, BigDecimal>> parentCurrency = rateMap.get(currency.toString());
                     Map<String, BigDecimal> parentRates = parentCurrency.get("rates");
-                    parentRates.put("BITCOIN", BigDecimal.valueOf(1).divide(rateAmount));
+                    https://stackoverflow.com/questions/4591206/arithmeticexception-non-terminating-decimal-expansion-no-exact-representable
+                    parentRates.put("BITCOIN", BigDecimal.valueOf(1).divide(rateAmount, 2, RoundingMode.HALF_UP));
                 }
             }
     	} catch (IOException e) {
