@@ -402,9 +402,15 @@ public class TransactBitcoinController {
 		//After creating buy or sell order, we will call settle bitcoin transactions
 
 		settleBitcoinTransactions();
-
-		Email.sendmail(bitcoinTransaction.getCustomer().getEmail().toString(), "Hey, we hope you are staying safe, "
-				+ "Your order with id " + bitcoinTransaction.getId() + " has been placed. Check portal for updates");
+		String emailMessage = "";
+		if(bitcoinTransaction.getStatus() == OrderStatus.CANCELLED) {
+			emailMessage = "Hey, we hope you are staying safe, "
+					+ "Your order with id " + bitcoinTransaction.getId() + " has been cancelled. Check portal for updates.";
+		} else {
+			emailMessage = "Hey, we hope you are staying safe, "
+					+ "Your order with id " + bitcoinTransaction.getId() + " has been placed. Check portal for updates.";
+		}
+		Email.sendmail(bitcoinTransaction.getCustomer().getEmail().toString(), emailMessage);
 		return ResponseEntity.ok(updatedEntity);
 
 	}
