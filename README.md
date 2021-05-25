@@ -1,10 +1,18 @@
-# bitcorner
-CMPE 275 project
+# Team
+@singhal-akash67 - Akash Singhal(SJSU ID: 015257203) akash.singhal@sjsu.edu
+@narensulegai - Naren Janardhan Sulegai(SJSU ID: 014483443) narenjanardhan.sulegai@sjsu.edu
+@sowmyadvn - Sowmya Dharani(SJSU ID: 01145168) sowmya.dharanipragada@sjsu.edu
 
-# Please don't share the bitcorner-XXXY.json file over email or github.
+# App URL
+
+http://ec2-3-142-122-215.us-east-2.compute.amazonaws.com:8080/#/
+
+# Build instructions
 ```
 #Run locally
-GOOGLE_APPLICATION_CREDENTIALS=<path to>/bitcorner.json mvn spring-boot:run
-#Package jar
-mvn package
+EMAIL_USER=bitcorner275@gmail.com EMAIL_PASSWORD=21Bitcorner275! GOOGLE_APPLICATION_CREDENTIALS=./bitcorner.json MYSQL_HOST=localhost DB_USER=<db user> DB_PASSWORD=<db password> java -jar ./demo-0.0.1-SNAPSHOT.jar
 ```
+
+# Source code 
+Spring Boot backend https://github.com/narensulegai/bitcorner
+ReactJS frontend https://github.com/narensulegai/bitcorner-frontend
