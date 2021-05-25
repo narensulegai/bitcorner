@@ -5,6 +5,8 @@
 
 @sowmyadvn - Sowmya Dharani(SJSU ID: 01145168) sowmya.dharanipragada@sjsu.edu
 
+@vandanachandola - Vandana Chandola(SJSU ID: 014748604) vandana.chandola@sjsu.edu
+
 # App URL
 
 http://ec2-3-142-122-215.us-east-2.compute.amazonaws.com:8080/#/
