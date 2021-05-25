@@ -7,7 +7,7 @@ public class Reports {
 	int totalOrdersCreated;
 	int noOfOrdersFulfilled;
 	List<BalanceEntity> bitcornerBalance;
-    Prices lastestPrices;
+    List<Prices> lastestPrices;
     
 	List<TransactBitcoinEntity> transactions;
 	List<BalanceEntity> balances;
@@ -35,10 +35,10 @@ public class Reports {
 	public void setBills(List<BillEntity> bills) {
 		this.bills = bills;
 	}
-	public Prices getLastestPrices() {
+	public List<Prices> getLastestPrices() {
 		return lastestPrices;
 	}
-	public void setLastestPrices(Prices lastestPrices) {
+	public void setLastestPrices(List<Prices> lastestPrices) {
 		this.lastestPrices = lastestPrices;
 	}
 	

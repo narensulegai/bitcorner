@@ -69,10 +69,6 @@ public class ReportingController {
 		
 		List<Prices> prices = priceRepository.findAll();
 		
-		Prices price = null;
-		
-		if(prices.size() != 0) 
-			price = prices.get(0);
 		
 		List<TransactBitcoinEntity> transactions = transactBitcoinRepository.findByCustomerId(customerEntity.getId());
 		List<BillEntity> bills = billRepository.findByCustomerId(customerEntity.getId());
@@ -84,7 +80,7 @@ public class ReportingController {
 		report.setNoOfOrdersFulfilled(totalFullfilledOrders);
 		report.setTotalOrdersCreated(totalOrders);
 		report.setTotalCustomers(customers);
-		report.setLastestPrices(price);
+		report.setLastestPrices(prices);
 		report.setTransactions(transactions);
 		report.setBills(bills);
 		report.setBalances(balances);

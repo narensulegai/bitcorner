@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 
+import com.example.demo.Currency;
+
 @Entity
 @Table(name = "prices")
 public class Prices {
@@ -24,6 +26,17 @@ public class Prices {
     @Column(nullable = true)
     @Min(0)
     BigDecimal latestTransactionPrice = BigDecimal.valueOf(10);
+    
+    @Enumerated(EnumType.STRING)
+    Currency currency = Currency.USD;
+
+	public Currency getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(Currency currency) {
+		this.currency = currency;
+	}
 
 	public BigDecimal getLatestAskPrice() {
 		return latestAskPrice;

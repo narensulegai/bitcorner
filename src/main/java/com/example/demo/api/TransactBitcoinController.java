@@ -140,8 +140,7 @@ public class TransactBitcoinController {
 			}
 			transactBitcoinRepository.save(sellOrders);
 			
-			List<Prices> prices = priceRepository.findAll();
-			Prices price = prices.get(0);
+			Prices price = priceRepository.findByCurrency(sellOrders.getCurrency());
 			price.setLatestTransactionPrice(sellOrders.getAmount());
 			priceRepository.save(price);
 			
@@ -170,8 +169,6 @@ public class TransactBitcoinController {
 			
 			
 	
-
-
 			for(TransactBitcoinEntity current : list) {
 
 				BalanceEntity currentBalance = balanceRepository.findByBankAccountAndCurrency(current.getCustomer().getBankAccount(), current.getCurrency());
@@ -231,8 +228,7 @@ public class TransactBitcoinController {
 			}
 			transactBitcoinRepository.save(buyOrder);
 			
-			List<Prices> prices = priceRepository.findAll();
-			Prices price = prices.get(0);
+			Prices price = priceRepository.findByCurrency(buyOrder.getCurrency());
 			price.setLatestTransactionPrice(maxSellAmount);
 			priceRepository.save(price);
 		} 
@@ -359,8 +355,7 @@ public class TransactBitcoinController {
 		CustomerEntity customerEntity = (CustomerEntity) SecurityContextHolder.getContext()
 				.getAuthentication().getPrincipal();
 
-        List<Prices> latest = priceRepository.findAll();
-        Prices price = latest.get(0);
+        Prices price = priceRepository.findByCurrency(bitcoinTransaction.getCurrency());
         
 
 		if(bitcoinTransaction.isBuy()) {
