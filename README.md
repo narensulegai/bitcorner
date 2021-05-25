@@ -13,7 +13,7 @@ http://ec2-3-142-122-215.us-east-2.compute.amazonaws.com:8080/#/
 
 The appication has been packaged as a jar file, please set the following database connection environment variables to run the jar.
 
-MYSQL_HOST=<db host> DB_USER=<db user> DB_PASSWORD=<db password>
+`MYSQL_HOST=<db host> DB_USER=<db user> DB_PASSWORD=<db password>`
 
   
 # You can run locally using
