@@ -17,12 +17,12 @@ The appication has been packaged as a jar file, please set the following databas
 
 Please insert the following rows
 
-`
+```
 INSERT INTO `bitcorner`.`prices` (`id`, `currency`, `latest_ask_price`, `latest_bid_price`, `latest_transaction_price`) VALUES (2, 'GBP', 10, 10, 10);
 INSERT INTO `bitcorner`.`prices` (`id`, `currency`, `latest_ask_price`, `latest_bid_price`, `latest_transaction_price`) VALUES (3, 'INR', 10, 10, 10);
 INSERT INTO `bitcorner`.`prices` (`id`, `currency`, `latest_ask_price`, `latest_bid_price`, `latest_transaction_price`) VALUES (4, 'EUR', 10, 10, 10);
 INSERT INTO `bitcorner`.`prices` (`id`, `currency`, `latest_ask_price`, `latest_bid_price`, `latest_transaction_price`) VALUES (5, 'RMB', 10, 10, 10);
-`
+```
 
   
 # You can run locally using
