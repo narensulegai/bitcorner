@@ -1,6 +1,8 @@
 # Team
 @singhal-akash67 - Akash Singhal(SJSU ID: 015257203) akash.singhal@sjsu.edu
+
 @narensulegai - Naren Janardhan Sulegai(SJSU ID: 014483443) narenjanardhan.sulegai@sjsu.edu
+
 @sowmyadvn - Sowmya Dharani(SJSU ID: 01145168) sowmya.dharanipragada@sjsu.edu
 
 # App URL
