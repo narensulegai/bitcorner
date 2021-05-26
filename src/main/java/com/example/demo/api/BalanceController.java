@@ -78,7 +78,7 @@ public class BalanceController {
                     currentRates.put(currency.toString(), rateAmount);
                     Map<String, Map<String, BigDecimal>> parentCurrency = rateMap.get(currency.toString());
                     Map<String, BigDecimal> parentRates = parentCurrency.get("rates");
-                    https://stackoverflow.com/questions/4591206/arithmeticexception-non-terminating-decimal-expansion-no-exact-representable
+                    // https://stackoverflow.com/questions/4591206/arithmeticexception-non-terminating-decimal-expansion-no-exact-representable
                     parentRates.put("BITCOIN", BigDecimal.valueOf(1).divide(rateAmount, 2, RoundingMode.HALF_UP));
                 }
             }
